@@ -6,97 +6,111 @@ using UnityEngine.ProBuilder.Shapes;
 
 public class SwitchColor : MonoBehaviour
 {
-    public bool updateColorNSize;
+    public bool updateColorAndCollision;
     public Material materialGreen;
     public Material materialRed;
 
     public Color greenOpaque;
     public Color greenTranparant;
-    private Color setGreenColor;
-
     public Color redOpaque;
     public Color redTranparant;
-    private Color setRedColor;
-
 
     private GameObject[] greenTagArray;
     private GameObject[] redTagArray;
 
-    private bool greenCollisionActive = true;
+    private bool greenCollisionIsActive = true;
 
-    void Start()
+    void CreateArraysWithTaggedObj() // Store all objects tagged with in arrays:
     {
-        // Store all objects taged with in arrays:
         greenTagArray = GameObject.FindGameObjectsWithTag("greenTag");
         redTagArray = GameObject.FindGameObjectsWithTag("redTag");
+    }
 
-        // Set the correct material based on the tags: 
+
+    void OnValidate() // When updating the object "Controller - SwitchColor", thiss triggers: 
+    {
+        CreateArraysWithTaggedObj();
+
+        // Set the correct starting color and collliion based on the tag:
         foreach (GameObject objGreen in greenTagArray)
         {
             objGreen.GetComponent<MeshRenderer>().material = materialGreen;
+            objGreen.GetComponent<MeshCollider>().enabled = false;
         }
         foreach (GameObject objRed in redTagArray)
         {
             objRed.GetComponent<MeshRenderer>().material = materialRed;
+            objRed.GetComponent<MeshCollider>().enabled = true;
         }
-
-
 
     }
 
+    void Start()
+    {
+        CreateArraysWithTaggedObj();
 
-   
+        // Set the correct starting color and collliion based on the tag: 
+        foreach (GameObject objGreen in greenTagArray)
+        {
+            objGreen.GetComponent<MeshRenderer>().material = materialGreen;
+            objGreen.GetComponent<MeshCollider>().enabled = false;
+        }
+        foreach (GameObject objRed in redTagArray)
+        {
+            objRed.GetComponent<MeshRenderer>().material = materialRed;
+            objRed.GetComponent<MeshCollider>().enabled = true;
+        }
+    }
+
 
     void Update()
     {
         if (Input.GetKeyDown("space"))
         {
-            Debug.Log("Pressed Space");
             // Switch which color is active:
-            greenCollisionActive = !greenCollisionActive;
+            greenCollisionIsActive = !greenCollisionIsActive;
 
-            if (greenCollisionActive == true)
+
+            // If GREEN should have active collision:
+            if (greenCollisionIsActive == true)
             {
-                setGreenColor = greenOpaque;
-                setRedColor = redTranparant;
+                // Update all Green objects:
+                foreach (GameObject objGreen in greenTagArray)
+                {
+                    objGreen.GetComponent<MeshRenderer>().material.color = greenOpaque;
+                    objGreen.GetComponent<MeshCollider>().enabled = true;
+                    Debug.Log("loop");
+                }
+
+                // Update all Red objects:
+                foreach (GameObject objRed in redTagArray)
+                {
+                    objRed.GetComponent<MeshRenderer>().material.color = redTranparant;
+                    objRed.GetComponent<MeshCollider>().enabled = false;
+                    Debug.Log("loop");
+                }
             }
-            if (greenCollisionActive == false)
+
+
+            // If RED should have active collision:
+            if (greenCollisionIsActive == false)
             {
-                setGreenColor = greenTranparant;
-                setRedColor = redOpaque;
-            }
-            
-            foreach (GameObject objX in greenTagArray)
-            {
-                objX.GetComponent<MeshRenderer>().material.color = setGreenColor;
-                Debug.Log("loop");
-            }
-            foreach (GameObject objX in redTagArray)
-            {
-                objX.GetComponent<MeshRenderer>().material.color = setRedColor;
-                Debug.Log("loop");
-            }
-            
+                // Update all Green objects:
+                foreach (GameObject objGreen in greenTagArray)
+                {
+                    objGreen.GetComponent<MeshRenderer>().material.color = greenTranparant;
+                    objGreen.GetComponent<MeshCollider>().enabled = false;
+                    Debug.Log("loop");
+                }
+
+                // Update all Red objects:
+                foreach (GameObject objRed in redTagArray)
+                {
+                    objRed.GetComponent<MeshRenderer>().material.color = redOpaque;
+                    objRed.GetComponent<MeshCollider>().enabled = true;
+                    Debug.Log("loop");
+                }
+            } 
         }
-    }
-
-    void OnValidate()
-    {
-        Debug.Log("Controller - Inspector updated");
-
-        // Store all objects taged with in arrays:
-        greenTagArray = GameObject.FindGameObjectsWithTag("greenTag");
-        redTagArray = GameObject.FindGameObjectsWithTag("redTag");
-
-        // Set the correct material based on the tag:
-        foreach (GameObject objGreen in greenTagArray)
-        {
-            objGreen.GetComponent<MeshRenderer>().material = materialGreen;
-        }
-        foreach (GameObject objRed in redTagArray)
-        {
-            objRed.GetComponent<MeshRenderer>().material = materialRed;
-        }
-
     }
 }
